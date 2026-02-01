@@ -1,12 +1,11 @@
 # cor.table.jap
 
-研究用の相関表を手早く作るための軽量Rパッケージです。日本語の論文・報告書向けに、**小数点位置の揃え**と**有意記号**を前提にした表を出力できます。
+研究用の相関表を手早く作るための軽量Rパッケージです。日本語の論文・報告書向けに、**有意記号**や**小数点位置の揃え（任意）**に対応した表を出力できます。
 
 ## 特長
 - 下三角の相関表を作成
-- **正の相関は先頭に半角スペース**を入れて小数点位置を揃える
 - 有意確率を `* / ** / ***` で付与
-- CSV出力にそのまま使える表形式
+- CSV/Excel出力にそのまま使える表形式
 
 ## インストール（GitHub公開後）
 ```r
@@ -38,7 +37,8 @@ vars <- c("PAS_特定項目", "SSS_総合得点", "PSS_総合得点", "DASS_抑�
 write_lower_triangle_corr_tables(df, vars, "corr_lowertri")
 
 # Excel（3シート: r_sig / r / p。r_sigの*列見出しは空白）
-write_lower_triangle_corr_xlsx(df, vars, "corr_lowertri.xlsx")
+# 日本語の変数名は font_name で日本語フォントを指定推奨
+write_lower_triangle_corr_xlsx(df, vars, "corr_lowertri.xlsx", font_name = "Hiragino Sans")
 ```
 
 ### 2) 行×列の相関表（特定の項目×尺度など）
@@ -52,9 +52,10 @@ print(mat)
 
 ## 出力形式のルール
 - 相関係数は小数点以下2桁に固定
-- **正の値は先頭を非改行スペースに置換**（小数点を揃えるため）
-- 有意確率に `* / ** / ***` を付与
+- 有意確率は `* / ** / ***`（r/p/stars を分ける出力では stars 列に出力）
+- 旧来の「rと*を1セルにまとめる表」では小数点合わせのために先頭スペースを入れる場合あり（`quote_text` で非改行スペース化可）
 - Excel出力は `openxlsx` を利用（既定フォント: Times New Roman）
+- 日本語変数名を崩さないために、`write_lower_triangle_corr_xlsx(..., font_name = "日本語フォント名")` の指定を推奨
 
 ## よくある質問
 
