@@ -1,0 +1,15 @@
+Package: cor.table.jap
+Type: Package
+Title: Correlation Table Helpers for Japanese Research Reports
+Version: 0.1.0
+Authors@R: person("Akio", "", role = c("aut", "cre"), email = "akiyama0725.1999@gmail.com")
+Author: Akio [aut, cre]
+Maintainer: Akio <akiyama0725.1999@gmail.com>
+Description: Helper functions to build correlation tables with aligned decimals,
+  lower-triangle layout, and significance marks for research reporting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+  stats
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
