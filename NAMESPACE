@@ -1,2 +1,5 @@
 export(lower_triangle_corr_table)
+export(lower_triangle_corr_outputs)
 export(nice_correlation)
+export(write_lower_triangle_corr_tables)
+export(write_lower_triangle_corr_xlsx)

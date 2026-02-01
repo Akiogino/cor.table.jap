@@ -30,6 +30,17 @@ out <- cbind(変数 = rownames(tab), tab)
 write.csv(out, "corr_lowertri.csv", row.names = FALSE, fileEncoding = "UTF-8")
 ```
 
+### 1-b) 下三角の相関表（r / p / stars の3ファイル＋Excel3シート）
+```r
+vars <- c("PAS_特定項目", "SSS_総合得点", "PSS_総合得点", "DASS_抑うつ")
+
+# CSV（_r/_p/_stars/_r_sig が付く。_r_sigの*列見出しは空白）
+write_lower_triangle_corr_tables(df, vars, "corr_lowertri")
+
+# Excel（3シート: r_sig / r / p。r_sigの*列見出しは空白）
+write_lower_triangle_corr_xlsx(df, vars, "corr_lowertri.xlsx")
+```
+
 ### 2) 行×列の相関表（特定の項目×尺度など）
 ```r
 rows <- c("PAS_特定項目", "PAS_2", "PAS_5")
@@ -41,8 +52,9 @@ print(mat)
 
 ## 出力形式のルール
 - 相関係数は小数点以下2桁に固定
-- **正の値は先頭に半角スペース**（小数点を揃えるため）
+- **正の値は先頭を非改行スペースに置換**（小数点を揃えるため）
 - 有意確率に `* / ** / ***` を付与
+- Excel出力は `openxlsx` を利用（既定フォント: Times New Roman）
 
 ## よくある質問
 
