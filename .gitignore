@@ -1,1 +1,4 @@
 *.Rcheck
+renv/library/
+renv/staging/
+renv/python/

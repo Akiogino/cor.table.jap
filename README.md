@@ -13,6 +13,21 @@ install.packages("devtools")
 devtools::install_github("Akiogino/cor.table.jap")
 ```
 
+## チュートリアルの実行（再現可能）
+公開時に誰でも実行できるよう、`renv` と固定コミットを使います。
+
+```r
+renv::restore()
+```
+
+```sh
+quarto render notebooks/tutorial_cor_table_jap.qmd
+```
+
+補足:
+- ノートブック内の `pkg_ref` を変更すると、GitHub 参照先（タグ/コミット）を切り替えられます。
+- 開発中にローカルの R/ を読み込む場合は `COR_TABLE_JAP_DEV=1` を設定してください。
+
 ## 使い方
 
 ### 1) 下三角の相関表

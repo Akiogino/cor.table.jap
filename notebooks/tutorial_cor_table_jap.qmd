@@ -1,0 +1,333 @@
+---
+title: "cor.table.jap チュートリアル"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    code-summary: "コードを表示"
+    df-print: paged
+execute:
+  warning: false
+  message: false
+---
+
+## このノートブックについて
+
+このチュートリアルは、`cor.table.jap` の主要機能を**再現可能なダミーデータ**で実演します。
+
+- 下三角の相関表
+- 行×列の相関表
+- r / p / stars の分割出力（CSV/Excel）
+- 日本語変数名に対応した Excel フォント指定
+
+> このノートブックは `set.seed()` を使うため、同じ結果が再現できます。
+
+## セットアップ
+
+公開版は `renv.lock` で再現できるため、必要に応じて `renv::restore()` を先に実行してください。
+
+```{r}
+# パッケージ読み込み
+# 公開用: GitHub からインストール（再現性のため固定コミットを指定）
+# 開発用: COR_TABLE_JAP_DEV=1 を設定してリポジトリ直読み込み
+pkg_name <- "cor.table.jap"
+pkg_ref <- "Akiogino/cor.table.jap@fa8897ffb3b206ba8f24dbdbb56f14b5b9998448"
+
+find_pkg_root <- function(start_dir, pkg_name = NULL) {
+    dir <- normalizePath(start_dir, mustWork = FALSE)
+    for (i in 0:8) {
+        desc_path <- file.path(dir, "DESCRIPTION")
+        r_path <- file.path(dir, "R")
+        r_files <- if (dir.exists(r_path)) list.files(r_path, pattern = "\\\\.R$", full.names = TRUE) else character()
+        if (file.exists(desc_path) && length(r_files) > 0) {
+            if (is.null(pkg_name)) {
+                return(dir)
+            }
+            pkg_line <- tryCatch(readLines(desc_path, warn = FALSE), error = function(e) character())
+            pkg_match <- grep("^Package:", pkg_line, value = TRUE)
+            if (length(pkg_match) > 0 && grepl(pkg_name, pkg_match, fixed = TRUE)) {
+                return(dir)
+            }
+        }
+        parent <- dirname(dir)
+        if (parent == dir) break
+        dir <- parent
+    }
+    NULL
+}
+
+find_pkg_root_by_name <- function(start_dir, pkg_name) {
+    dir <- normalizePath(start_dir, mustWork = FALSE)
+    for (i in 0:8) {
+        cand <- file.path(dir, pkg_name)
+        if (dir.exists(cand)) {
+            pkg_root <- find_pkg_root(cand, pkg_name = pkg_name)
+            if (!is.null(pkg_root)) {
+                return(pkg_root)
+            }
+        }
+        parent <- dirname(dir)
+        if (parent == dir) break
+        dir <- parent
+    }
+    NULL
+}
+
+is_abs_path <- function(path) {
+    grepl("^(/|[A-Za-z]:[\\\\/])", path)
+}
+
+normalize_doc_path <- function(path) {
+    if (!nzchar(path)) {
+        return(path)
+    }
+    if (grepl("^file://", path)) {
+        path <- sub("^file://", "", path)
+        path <- sub("^localhost/", "", path)
+        path <- utils::URLdecode(path)
+    }
+    path
+}
+
+resolve_doc_dir <- function(doc_path) {
+    if (!nzchar(doc_path)) {
+        return(NULL)
+    }
+    doc_path <- normalize_doc_path(doc_path)
+    proj_dir <- Sys.getenv("QUARTO_PROJECT_DIR", "")
+    pwd <- Sys.getenv("PWD", "")
+    if (!is_abs_path(doc_path)) {
+        if (nzchar(proj_dir)) {
+            doc_path <- file.path(proj_dir, doc_path)
+        } else if (nzchar(pwd)) {
+            doc_path <- file.path(pwd, doc_path)
+        } else {
+            doc_path <- file.path(getwd(), doc_path)
+        }
+    }
+    dirname(normalizePath(doc_path, mustWork = FALSE))
+}
+
+load_from_repo <- function() {
+    input_dir <- NULL
+    doc_path <- Sys.getenv("QUARTO_DOCUMENT_PATH", "")
+    if (nzchar(doc_path)) {
+        input_dir <- resolve_doc_dir(doc_path)
+    } else {
+        input_path <- tryCatch(knitr::current_input(), error = function(e) NULL)
+        input_dir <- resolve_doc_dir(input_path)
+    }
+    if (is.null(input_dir) || !nzchar(input_dir)) {
+        input_dir <- getwd()
+    }
+
+    proj_dir <- Sys.getenv("QUARTO_PROJECT_DIR", "")
+    pwd <- Sys.getenv("PWD", "")
+    raw_candidates <- c(
+        if (!is.null(input_dir) && nzchar(input_dir)) file.path(input_dir, "..") else character(),
+        if (!is.null(input_dir) && nzchar(input_dir)) input_dir else character(),
+        if (nzchar(pwd)) file.path(pwd, pkg_name) else character(),
+        if (nzchar(pwd)) pwd else character(),
+        if (nzchar(proj_dir)) file.path(proj_dir, pkg_name) else character(),
+        if (nzchar(proj_dir)) proj_dir else character(),
+        file.path(getwd(), pkg_name),
+        getwd()
+    )
+    raw_candidates <- raw_candidates[nzchar(raw_candidates)]
+    candidates <- unique(normalizePath(raw_candidates, mustWork = FALSE))
+
+    pkg_root <- NULL
+    override <- Sys.getenv("COR_TABLE_JAP_ROOT", "")
+    if (nzchar(override)) {
+        pkg_root <- find_pkg_root(override, pkg_name = pkg_name)
+    }
+    for (cand in candidates) {
+        if (!nzchar(cand)) next
+        if (!is.null(pkg_root)) break
+        pkg_root <- find_pkg_root(cand, pkg_name = pkg_name)
+        if (!is.null(pkg_root)) break
+    }
+
+    if (is.null(pkg_root)) {
+        pkg_root <- find_pkg_root_by_name(input_dir, pkg_name)
+    }
+    if (is.null(pkg_root)) {
+        pkg_root <- find_pkg_root_by_name(getwd(), pkg_name)
+    }
+
+    if (is.null(pkg_root)) {
+        # 最後の手段: 指定候補配下に cor.table.jap があるか探索（深さ3まで）
+        base_dirs <- unique(normalizePath(c(
+            if (!is.null(input_dir) && nzchar(input_dir)) input_dir else character(),
+            if (nzchar(pwd)) pwd else character(),
+            if (nzchar(proj_dir)) proj_dir else character(),
+            getwd()
+        ), mustWork = FALSE))
+        for (base_dir in base_dirs) {
+            if (!nzchar(base_dir)) next
+            sub_dirs <- list.dirs(base_dir, recursive = TRUE, full.names = TRUE)
+            sub_dirs <- sub_dirs[basename(sub_dirs) == pkg_name]
+            if (length(sub_dirs) > 0) {
+                for (cand in sub_dirs) {
+                    pkg_root <- find_pkg_root(cand, pkg_name = pkg_name)
+                    if (!is.null(pkg_root)) break
+                }
+            }
+            if (!is.null(pkg_root)) break
+        }
+    }
+
+    if (is.null(pkg_root)) {
+        stop("パッケージのルートが見つかりません。環境変数 COR_TABLE_JAP_ROOT に cor.table.jap のパスを指定してください。")
+    }
+
+    r_dir <- file.path(pkg_root, "R")
+    r_files <- list.files(r_dir, pattern = "\\\\.R$", full.names = TRUE)
+    if (length(r_files) == 0) {
+        stop("R/ が見つかりません。ノートブックの場所を確認してください。")
+    }
+
+    for (f in r_files) {
+        source(f, local = FALSE)
+    }
+    invisible(TRUE)
+}
+
+use_dev <- identical(Sys.getenv("COR_TABLE_JAP_DEV", ""), "1")
+
+if (use_dev) {
+    message("開発モード: リポジトリ直読み込みを使用します。")
+    load_from_repo()
+} else {
+    if (!requireNamespace(pkg_name, quietly = TRUE)) {
+        if (!requireNamespace("remotes", quietly = TRUE)) {
+            install.packages("remotes")
+        }
+        remotes::install_github(pkg_ref, upgrade = "never", dependencies = TRUE)
+    }
+    library(cor.table.jap)
+}
+
+# 再現性のための乱数種
+set.seed(20260202)
+```
+
+## 1. サンプルデータの作成
+
+臨床心理学でよく使われる尺度名（略称）を使ったダミーデータを作成します。
+
+```{r}
+# サンプルデータ作成
+n <- 120
+
+# 潜在変数（臨床心理っぽい構造）
+# 1) マインドフルネス (m)
+# 2) 心理的ディストレス (d) は m と負の相関
+latent_m <- rnorm(n)
+latent_d <- -0.5 * latent_m + rnorm(n, 0, 0.7)
+
+# 臨床心理学で馴染みのある尺度名（略称）
+# 典型的な関係: FFMQ は STAI/PSS/DASS と負相関、STAI/PSS/DASS は正相関
+df <- data.frame(
+    FFMQ = latent_m + rnorm(n, 0, 0.5),
+    STAI = 0.9 * latent_d + rnorm(n, 0, 0.5),
+    PSS = 0.8 * latent_d + rnorm(n, 0, 0.6),
+    DASS = 0.85 * latent_d + rnorm(n, 0, 0.6)
+)
+
+# ざっと確認
+head(df)
+```
+
+## 2. 下三角の相関表
+
+`lower_triangle_corr_table()` で、下三角の相関表（有意記号付き）を作成します。
+
+```{r}
+vars <- c("FFMQ", "STAI", "PSS", "DASS")
+
+lower_tab <- lower_triangle_corr_table(df, vars)
+lower_tab
+```
+
+### CSVへの保存
+
+```{r}
+# 1列目に変数名を入れて保存
+out <- cbind(変数 = rownames(lower_tab), lower_tab)
+write.csv(out, "corr_lowertri.csv", row.names = FALSE, fileEncoding = "UTF-8")
+```
+
+## 3. 行×列の相関表
+
+特定の項目群（行）と尺度群（列）の相関表を作る場合は `nice_correlation()` を使います。
+
+```{r}
+rows <- c("FFMQ", "PSS")
+cols <- c("STAI", "DASS")
+
+mat <- nice_correlation(df, rows, cols)
+mat
+```
+
+## 4. r / p / stars を分けた出力
+
+`write_lower_triangle_corr_tables()` を使うと、以下の3種類を**別ファイル**で保存できます。
+
+- r（相関係数）
+- p（有意確率）
+- stars（有意記号）
+
+```{r}
+write_lower_triangle_corr_tables(df, vars, "corr_lowertri")
+```
+
+生成されるファイル例:
+
+- `corr_lowertri_r.csv`
+- `corr_lowertri_p.csv`
+- `corr_lowertri_stars.csv`
+- `corr_lowertri_r_sig.csv`（r + stars の表示用）
+
+## 5. Excel出力（日本語フォント指定）
+
+Excel出力には `write_lower_triangle_corr_xlsx()` を使います。日本語変数名が含まれる場合は、
+`font_name` に日本語フォントを指定すると表示崩れを防げます。
+
+```{r}
+write_lower_triangle_corr_xlsx(
+    df,
+    vars,
+    "corr_lowertri.xlsx",
+    font_name = "Hiragino Sans"
+)
+```
+
+生成される Excel のシート:
+
+- `r_sig`（表示用: r + stars）
+- `r`（数値のみ）
+- `p`（数値のみ）
+
+## 6. 補足: 先頭スペースと quote_text
+
+旧来の「r と * を同じセルに出す表」では、小数点を揃えるために
+**正の値の先頭へスペース**を入れることがあります。
+
+`quote_text = TRUE` を指定すると、Excelでスペースが消える問題を避けるために
+**非改行スペース**へ置換します。
+
+```{r}
+lower_tab_nbsp <- lower_triangle_corr_table(df, vars, quote_text = TRUE)
+lower_tab_nbsp
+```
+
+## 7. まとめ
+
+- `lower_triangle_corr_table()` で下三角の相関表
+- `nice_correlation()` で行×列の相関表
+- `write_lower_triangle_corr_tables()` / `write_lower_triangle_corr_xlsx()` で出力
+- 日本語変数名は `font_name` 指定推奨
+
+このノートブックをベースに、実データでの分析に置き換えてお使いください。

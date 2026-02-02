@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>cor.table.jap チュートリアル</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="tutorial_cor_table_jap_files/libs/clipboard/clipboard.min.js"></script>
+<script src="tutorial_cor_table_jap_files/libs/quarto-html/quarto.js"></script>
+<script src="tutorial_cor_table_jap_files/libs/quarto-html/popper.min.js"></script>
+<script src="tutorial_cor_table_jap_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="tutorial_cor_table_jap_files/libs/quarto-html/anchor.min.js"></script>
+<link href="tutorial_cor_table_jap_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="tutorial_cor_table_jap_files/libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="tutorial_cor_table_jap_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="tutorial_cor_table_jap_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="tutorial_cor_table_jap_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="tutorial_cor_table_jap_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="tutorial_cor_table_jap_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#このノートブックについて" id="toc-このノートブックについて" class="nav-link active" data-scroll-target="#このノートブックについて">このノートブックについて</a></li>
+  <li><a href="#セットアップ" id="toc-セットアップ" class="nav-link" data-scroll-target="#セットアップ">セットアップ</a></li>
+  <li><a href="#サンプルデータの作成" id="toc-サンプルデータの作成" class="nav-link" data-scroll-target="#サンプルデータの作成">1. サンプルデータの作成</a></li>
+  <li><a href="#下三角の相関表" id="toc-下三角の相関表" class="nav-link" data-scroll-target="#下三角の相関表">2. 下三角の相関表</a></li>
+  <li><a href="#行列の相関表" id="toc-行列の相関表" class="nav-link" data-scroll-target="#行列の相関表">3. 行×列の相関表</a></li>
+  <li><a href="#r-p-stars-を分けた出力" id="toc-r-p-stars-を分けた出力" class="nav-link" data-scroll-target="#r-p-stars-を分けた出力">4. r / p / stars を分けた出力</a></li>
+  <li><a href="#excel出力日本語フォント指定" id="toc-excel出力日本語フォント指定" class="nav-link" data-scroll-target="#excel出力日本語フォント指定">5. Excel出力（日本語フォント指定）</a></li>
+  <li><a href="#補足-先頭スペースと-quote_text" id="toc-補足-先頭スペースと-quote_text" class="nav-link" data-scroll-target="#補足-先頭スペースと-quote_text">6. 補足: 先頭スペースと quote_text</a></li>
+  <li><a href="#まとめ" id="toc-まとめ" class="nav-link" data-scroll-target="#まとめ">7. まとめ</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">cor.table.jap チュートリアル</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="このノートブックについて" class="level2">
+<h2 class="anchored" data-anchor-id="このノートブックについて">このノートブックについて</h2>
+<p>このチュートリアルは、<code>cor.table.jap</code> の主要機能を<strong>再現可能なダミーデータ</strong>で実演します。</p>
+<ul>
+<li>下三角の相関表</li>
+<li>行×列の相関表</li>
+<li>r / p / stars の分割出力（CSV/Excel）</li>
+<li>日本語変数名に対応した Excel フォント指定</li>
+</ul>
+<blockquote class="blockquote">
+<p>このノートブックは <code>set.seed()</code> を使うため、同じ結果が再現できます。</p>
+</blockquote>
+</section>
+<section id="セットアップ" class="level2">
+<h2 class="anchored" data-anchor-id="セットアップ">セットアップ</h2>
+<p>公開版は <code>renv.lock</code> で再現できるため、必要に応じて <code>renv::restore()</code> を先に実行してください。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># パッケージ読み込み</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 公開用: GitHub からインストール（再現性のため固定コミットを指定）</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 開発用: COR_TABLE_JAP_DEV=1 を設定してリポジトリ直読み込み</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>pkg_name <span class="ot">&lt;-</span> <span class="st">"cor.table.jap"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pkg_ref <span class="ot">&lt;-</span> <span class="st">"Akiogino/cor.table.jap@fa8897ffb3b206ba8f24dbdbb56f14b5b9998448"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>find_pkg_root <span class="ot">&lt;-</span> <span class="cf">function</span>(start_dir, <span class="at">pkg_name =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    dir <span class="ot">&lt;-</span> <span class="fu">normalizePath</span>(start_dir, <span class="at">mustWork =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">8</span>) {</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        desc_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir, <span class="st">"DESCRIPTION"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        r_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir, <span class="st">"R"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        r_files <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">dir.exists</span>(r_path)) <span class="fu">list.files</span>(r_path, <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\\\</span><span class="st">.R$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>) <span class="cf">else</span> <span class="fu">character</span>()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">file.exists</span>(desc_path) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(r_files) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">is.null</span>(pkg_name)) {</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                <span class="fu">return</span>(dir)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            pkg_line <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(<span class="fu">readLines</span>(desc_path, <span class="at">warn =</span> <span class="cn">FALSE</span>), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">character</span>())</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            pkg_match <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^Package:"</span>, pkg_line, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">length</span>(pkg_match) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">grepl</span>(pkg_name, pkg_match, <span class="at">fixed =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                <span class="fu">return</span>(dir)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        parent <span class="ot">&lt;-</span> <span class="fu">dirname</span>(dir)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (parent <span class="sc">==</span> dir) <span class="cf">break</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        dir <span class="ot">&lt;-</span> parent</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cn">NULL</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>find_pkg_root_by_name <span class="ot">&lt;-</span> <span class="cf">function</span>(start_dir, pkg_name) {</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    dir <span class="ot">&lt;-</span> <span class="fu">normalizePath</span>(start_dir, <span class="at">mustWork =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">8</span>) {</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        cand <span class="ot">&lt;-</span> <span class="fu">file.path</span>(dir, pkg_name)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">dir.exists</span>(cand)) {</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root</span>(cand, <span class="at">pkg_name =</span> pkg_name)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pkg_root)) {</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>                <span class="fu">return</span>(pkg_root)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        parent <span class="ot">&lt;-</span> <span class="fu">dirname</span>(dir)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (parent <span class="sc">==</span> dir) <span class="cf">break</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        dir <span class="ot">&lt;-</span> parent</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="cn">NULL</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>is_abs_path <span class="ot">&lt;-</span> <span class="cf">function</span>(path) {</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"^(/|[A-Za-z]:[</span><span class="sc">\\\\</span><span class="st">/])"</span>, path)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>normalize_doc_path <span class="ot">&lt;-</span> <span class="cf">function</span>(path) {</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nzchar</span>(path)) {</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(path)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">"^file://"</span>, path)) {</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        path <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"^file://"</span>, <span class="st">""</span>, path)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        path <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"^localhost/"</span>, <span class="st">""</span>, path)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        path <span class="ot">&lt;-</span> utils<span class="sc">::</span><span class="fu">URLdecode</span>(path)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    path</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>resolve_doc_dir <span class="ot">&lt;-</span> <span class="cf">function</span>(doc_path) {</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nzchar</span>(doc_path)) {</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    doc_path <span class="ot">&lt;-</span> <span class="fu">normalize_doc_path</span>(doc_path)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    proj_dir <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"QUARTO_PROJECT_DIR"</span>, <span class="st">""</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    pwd <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"PWD"</span>, <span class="st">""</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is_abs_path</span>(doc_path)) {</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nzchar</span>(proj_dir)) {</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>            doc_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(proj_dir, doc_path)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">nzchar</span>(pwd)) {</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>            doc_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(pwd, doc_path)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>            doc_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">getwd</span>(), doc_path)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dirname</span>(<span class="fu">normalizePath</span>(doc_path, <span class="at">mustWork =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>load_from_repo <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    input_dir <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>    doc_path <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"QUARTO_DOCUMENT_PATH"</span>, <span class="st">""</span>)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nzchar</span>(doc_path)) {</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>        input_dir <span class="ot">&lt;-</span> <span class="fu">resolve_doc_dir</span>(doc_path)</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>        input_path <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(knitr<span class="sc">::</span><span class="fu">current_input</span>(), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span>)</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>        input_dir <span class="ot">&lt;-</span> <span class="fu">resolve_doc_dir</span>(input_path)</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(input_dir) <span class="sc">||</span> <span class="sc">!</span><span class="fu">nzchar</span>(input_dir)) {</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>        input_dir <span class="ot">&lt;-</span> <span class="fu">getwd</span>()</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>    proj_dir <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"QUARTO_PROJECT_DIR"</span>, <span class="st">""</span>)</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>    pwd <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"PWD"</span>, <span class="st">""</span>)</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>    raw_candidates <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(input_dir) <span class="sc">&amp;&amp;</span> <span class="fu">nzchar</span>(input_dir)) <span class="fu">file.path</span>(input_dir, <span class="st">".."</span>) <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(input_dir) <span class="sc">&amp;&amp;</span> <span class="fu">nzchar</span>(input_dir)) input_dir <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nzchar</span>(pwd)) <span class="fu">file.path</span>(pwd, pkg_name) <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nzchar</span>(pwd)) pwd <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nzchar</span>(proj_dir)) <span class="fu">file.path</span>(proj_dir, pkg_name) <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nzchar</span>(proj_dir)) proj_dir <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.path</span>(<span class="fu">getwd</span>(), pkg_name),</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>        <span class="fu">getwd</span>()</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>    raw_candidates <span class="ot">&lt;-</span> raw_candidates[<span class="fu">nzchar</span>(raw_candidates)]</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>    candidates <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">normalizePath</span>(raw_candidates, <span class="at">mustWork =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>    pkg_root <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>    override <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"COR_TABLE_JAP_ROOT"</span>, <span class="st">""</span>)</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nzchar</span>(override)) {</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>        pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root</span>(override, <span class="at">pkg_name =</span> pkg_name)</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (cand <span class="cf">in</span> candidates) {</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nzchar</span>(cand)) <span class="cf">next</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pkg_root)) <span class="cf">break</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>        pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root</span>(cand, <span class="at">pkg_name =</span> pkg_name)</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pkg_root)) <span class="cf">break</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(pkg_root)) {</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>        pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root_by_name</span>(input_dir, pkg_name)</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(pkg_root)) {</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>        pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root_by_name</span>(<span class="fu">getwd</span>(), pkg_name)</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(pkg_root)) {</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 最後の手段: 指定候補配下に cor.table.jap があるか探索（深さ3まで）</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>        base_dirs <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">normalizePath</span>(<span class="fu">c</span>(</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(input_dir) <span class="sc">&amp;&amp;</span> <span class="fu">nzchar</span>(input_dir)) input_dir <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">nzchar</span>(pwd)) pwd <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">nzchar</span>(proj_dir)) proj_dir <span class="cf">else</span> <span class="fu">character</span>(),</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>            <span class="fu">getwd</span>()</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>        ), <span class="at">mustWork =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (base_dir <span class="cf">in</span> base_dirs) {</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nzchar</span>(base_dir)) <span class="cf">next</span></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>            sub_dirs <span class="ot">&lt;-</span> <span class="fu">list.dirs</span>(base_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>            sub_dirs <span class="ot">&lt;-</span> sub_dirs[<span class="fu">basename</span>(sub_dirs) <span class="sc">==</span> pkg_name]</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">length</span>(sub_dirs) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> (cand <span class="cf">in</span> sub_dirs) {</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>                    pkg_root <span class="ot">&lt;-</span> <span class="fu">find_pkg_root</span>(cand, <span class="at">pkg_name =</span> pkg_name)</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pkg_root)) <span class="cf">break</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>                }</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(pkg_root)) <span class="cf">break</span></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(pkg_root)) {</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"パッケージのルートが見つかりません。環境変数 COR_TABLE_JAP_ROOT に cor.table.jap のパスを指定してください。"</span>)</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>    r_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(pkg_root, <span class="st">"R"</span>)</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>    r_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(r_dir, <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\\\</span><span class="st">.R$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(r_files) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"R/ が見つかりません。ノートブックの場所を確認してください。"</span>)</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (f <span class="cf">in</span> r_files) {</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>        <span class="fu">source</span>(f, <span class="at">local =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>    <span class="fu">invisible</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>use_dev <span class="ot">&lt;-</span> <span class="fu">identical</span>(<span class="fu">Sys.getenv</span>(<span class="st">"COR_TABLE_JAP_DEV"</span>, <span class="st">""</span>), <span class="st">"1"</span>)</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (use_dev) {</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"開発モード: リポジトリ直読み込みを使用します。"</span>)</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">load_from_repo</span>()</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(pkg_name, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"remotes"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>            <span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>        remotes<span class="sc">::</span><span class="fu">install_github</span>(pkg_ref, <span class="at">upgrade =</span> <span class="st">"never"</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(cor.table.jap)</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="co"># 再現性のための乱数種</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20260202</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="サンプルデータの作成" class="level2">
+<h2 class="anchored" data-anchor-id="サンプルデータの作成">1. サンプルデータの作成</h2>
+<p>臨床心理学でよく使われる尺度名（略称）を使ったダミーデータを作成します。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># サンプルデータ作成</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">120</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 潜在変数（臨床心理っぽい構造）</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) マインドフルネス (m)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) 心理的ディストレス (d) は m と負の相関</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>latent_m <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>latent_d <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">*</span> latent_m <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.7</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 臨床心理学で馴染みのある尺度名（略称）</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 典型的な関係: FFMQ は STAI/PSS/DASS と負相関、STAI/PSS/DASS は正相関</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">FFMQ =</span> latent_m <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">STAI =</span> <span class="fl">0.9</span> <span class="sc">*</span> latent_d <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">PSS =</span> <span class="fl">0.8</span> <span class="sc">*</span> latent_d <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.6</span>),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">DASS =</span> <span class="fl">0.85</span> <span class="sc">*</span> latent_d <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.6</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ざっと確認</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["FFMQ"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["STAI"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["PSS"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["DASS"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.4651028","2":"0.30066139","3":"0.5293223","4":"-0.58161941","_rn_":"1"},{"1":"-0.8800298","2":"-0.04521835","3":"0.3624625","4":"-0.73394607","_rn_":"2"},{"1":"1.0436698","2":"-0.70968277","3":"-1.1537667","4":"-0.14303968","_rn_":"3"},{"1":"-0.7393755","2":"-0.40810238","3":"1.2409031","4":"-0.13961507","_rn_":"4"},{"1":"-0.2368877","2":"1.38096372","3":"-0.3860341","4":"-0.08637143","_rn_":"5"},{"1":"1.7949077","2":"0.55328177","3":"-0.3861431","4":"0.96821437","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="下三角の相関表" class="level2">
+<h2 class="anchored" data-anchor-id="下三角の相関表">2. 下三角の相関表</h2>
+<p><code>lower_triangle_corr_table()</code> で、下三角の相関表（有意記号付き）を作成します。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"FFMQ"</span>, <span class="st">"STAI"</span>, <span class="st">"PSS"</span>, <span class="st">"DASS"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>lower_tab <span class="ot">&lt;-</span> <span class="fu">lower_triangle_corr_table</span>(df, vars)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>lower_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["FFMQ"],"name":[1],"type":["chr"],"align":["left"]},{"label":["STAI"],"name":[2],"type":["chr"],"align":["left"]},{"label":["PSS"],"name":[3],"type":["chr"],"align":["left"]},{"label":["DASS"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"","2":"","3":"","4":"","_rn_":"FFMQ"},{"1":"-0.24**","2":"","3":"","4":"","_rn_":"STAI"},{"1":"-0.27**","2":"0.56***","3":"","4":"","_rn_":"PSS"},{"1":"-0.23*","2":"0.61***","3":"0.61***","4":"","_rn_":"DASS"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<section id="csvへの保存" class="level3">
+<h3 class="anchored" data-anchor-id="csvへの保存">CSVへの保存</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1列目に変数名を入れて保存</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">cbind</span>(変数 <span class="ot">=</span> <span class="fu">rownames</span>(lower_tab), lower_tab)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(out, <span class="st">"corr_lowertri.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">fileEncoding =</span> <span class="st">"UTF-8"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="行列の相関表" class="level2">
+<h2 class="anchored" data-anchor-id="行列の相関表">3. 行×列の相関表</h2>
+<p>特定の項目群（行）と尺度群（列）の相関表を作る場合は <code>nice_correlation()</code> を使います。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rows <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"FFMQ"</span>, <span class="st">"PSS"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"STAI"</span>, <span class="st">"DASS"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">nice_correlation</span>(df, rows, cols)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>mat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["STAI"],"name":[1],"type":["chr"],"align":["left"]},{"label":["DASS"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"-0.24**","2":"-0.23*","_rn_":"FFMQ"},{"1":"0.56***","2":"0.61***","_rn_":"PSS"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="r-p-stars-を分けた出力" class="level2">
+<h2 class="anchored" data-anchor-id="r-p-stars-を分けた出力">4. r / p / stars を分けた出力</h2>
+<p><code>write_lower_triangle_corr_tables()</code> を使うと、以下の3種類を<strong>別ファイル</strong>で保存できます。</p>
+<ul>
+<li>r（相関係数）</li>
+<li>p（有意確率）</li>
+<li>stars（有意記号）</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_lower_triangle_corr_tables</span>(df, vars, <span class="st">"corr_lowertri"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>生成されるファイル例:</p>
+<ul>
+<li><code>corr_lowertri_r.csv</code></li>
+<li><code>corr_lowertri_p.csv</code></li>
+<li><code>corr_lowertri_stars.csv</code></li>
+<li><code>corr_lowertri_r_sig.csv</code>（r + stars の表示用）</li>
+</ul>
+</section>
+<section id="excel出力日本語フォント指定" class="level2">
+<h2 class="anchored" data-anchor-id="excel出力日本語フォント指定">5. Excel出力（日本語フォント指定）</h2>
+<p>Excel出力には <code>write_lower_triangle_corr_xlsx()</code> を使います。日本語変数名が含まれる場合は、 <code>font_name</code> に日本語フォントを指定すると表示崩れを防げます。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_lower_triangle_corr_xlsx</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    df,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    vars,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"corr_lowertri.xlsx"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">font_name =</span> <span class="st">"Hiragino Sans"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>生成される Excel のシート:</p>
+<ul>
+<li><code>r_sig</code>（表示用: r + stars）</li>
+<li><code>r</code>（数値のみ）</li>
+<li><code>p</code>（数値のみ）</li>
+</ul>
+</section>
+<section id="補足-先頭スペースと-quote_text" class="level2">
+<h2 class="anchored" data-anchor-id="補足-先頭スペースと-quote_text">6. 補足: 先頭スペースと quote_text</h2>
+<p>旧来の「r と * を同じセルに出す表」では、小数点を揃えるために <strong>正の値の先頭へスペース</strong>を入れることがあります。</p>
+<p><code>quote_text = TRUE</code> を指定すると、Excelでスペースが消える問題を避けるために <strong>非改行スペース</strong>へ置換します。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>コードを表示</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lower_tab_nbsp <span class="ot">&lt;-</span> <span class="fu">lower_triangle_corr_table</span>(df, vars, <span class="at">quote_text =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>lower_tab_nbsp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["FFMQ"],"name":[1],"type":["chr"],"align":["left"]},{"label":["STAI"],"name":[2],"type":["chr"],"align":["left"]},{"label":["PSS"],"name":[3],"type":["chr"],"align":["left"]},{"label":["DASS"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"","2":"","3":"","4":"","_rn_":"FFMQ"},{"1":"-0.24**","2":"","3":"","4":"","_rn_":"STAI"},{"1":"-0.27**","2":" 0.56***","3":"","4":"","_rn_":"PSS"},{"1":"-0.23*","2":" 0.61***","3":" 0.61***","4":"","_rn_":"DASS"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="まとめ" class="level2">
+<h2 class="anchored" data-anchor-id="まとめ">7. まとめ</h2>
+<ul>
+<li><code>lower_triangle_corr_table()</code> で下三角の相関表</li>
+<li><code>nice_correlation()</code> で行×列の相関表</li>
+<li><code>write_lower_triangle_corr_tables()</code> / <code>write_lower_triangle_corr_xlsx()</code> で出力</li>
+<li>日本語変数名は <code>font_name</code> 指定推奨</li>
+</ul>
+<p>このノートブックをベースに、実データでの分析に置き換えてお使いください。</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
