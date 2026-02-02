@@ -14,22 +14,22 @@ execute:
 
 ## このノートブックについて
 
-このチュートリアルは、`cor.table.jap` の主要機能を**再現可能なダミーデータ**で実演します。
+このチュートリアルは、`cor.table.jap` の主要機能を**ダミーデータ**で実演します。
 
 - 下三角の相関表
 - 行×列の相関表
 - r / p / stars の分割出力（CSV/Excel）
 - 日本語変数名に対応した Excel フォント指定
 
-> このノートブックは `set.seed()` を使うため、同じ結果が再現できます。
+> このノートブックは `set.seed()` を使用します。
 
 ## セットアップ
 
-公開版は `renv.lock` で再現できるため、必要に応じて `renv::restore()` を先に実行してください。
+必要に応じて `renv::restore()` を先に実行してください。
 
 ```{r}
 # パッケージ読み込み
-# 公開用: GitHub からインストール（再現性のため固定コミットを指定）
+# GitHub からインストール（固定コミットを指定）
 # 開発用: COR_TABLE_JAP_DEV=1 を設定してリポジトリ直読み込み
 pkg_name <- "cor.table.jap"
 pkg_ref <- "Akiogino/cor.table.jap@fa8897ffb3b206ba8f24dbdbb56f14b5b9998448"
@@ -209,26 +209,26 @@ if (use_dev) {
     library(cor.table.jap)
 }
 
-# 再現性のための乱数種
+# 乱数種
 set.seed(20260202)
 ```
 
 ## 1. サンプルデータの作成
 
-臨床心理学でよく使われる尺度名（略称）を使ったダミーデータを作成します。
+尺度名を使ったダミーデータを作成します。
 
 ```{r}
 # サンプルデータ作成
 n <- 120
 
-# 潜在変数（臨床心理っぽい構造）
+# 潜在変数（関連を持たせた構造）
 # 1) マインドフルネス (m)
 # 2) 心理的ディストレス (d) は m と負の相関
 latent_m <- rnorm(n)
 latent_d <- -0.5 * latent_m + rnorm(n, 0, 0.7)
 
-# 臨床心理学で馴染みのある尺度名（略称）
-# 典型的な関係: FFMQ は STAI/PSS/DASS と負相関、STAI/PSS/DASS は正相関
+# 尺度名
+# 想定する関係: FFMQ は STAI/PSS/DASS と負相関、STAI/PSS/DASS は正相関
 df <- data.frame(
     FFMQ = latent_m + rnorm(n, 0, 0.5),
     STAI = 0.9 * latent_d + rnorm(n, 0, 0.5),

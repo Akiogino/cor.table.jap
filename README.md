@@ -7,14 +7,14 @@
 - 有意確率を `* / ** / ***` で付与
 - CSV/Excel出力にそのまま使える表形式
 
-## インストール（GitHub公開後）
+## インストール（GitHub）
 ```r
 install.packages("remotes")
 remotes::install_github("Akiogino/cor.table.jap")
 ```
 
-## チュートリアルの実行（再現可能）
-公開時に誰でも実行できるよう、`renv` と固定コミットを使います。
+## チュートリアルの実行
+環境を揃えるために `renv` を使います。
 
 ```r
 renv::restore()
@@ -34,7 +34,7 @@ quarto render notebooks/tutorial_cor_table_jap.qmd
 ```r
 library(cor.table.jap)
 
-# 臨床心理でよく使われる尺度の略称例
+# 尺度名の例
 vars <- c("FFMQ", "STAI", "PSS", "DASS")
 
 tab <- lower_triangle_corr_table(df, vars)
