@@ -9,8 +9,8 @@
 
 ## インストール（GitHub公開後）
 ```r
-install.packages("devtools")
-devtools::install_github("Akiogino/cor.table.jap")
+install.packages("remotes")
+remotes::install_github("Akiogino/cor.table.jap")
 ```
 
 ## チュートリアルの実行（再現可能）
@@ -34,7 +34,8 @@ quarto render notebooks/tutorial_cor_table_jap.qmd
 ```r
 library(cor.table.jap)
 
-vars <- c("PAS_特定項目", "SSS_総合得点", "PSS_総合得点", "DASS_抑うつ")
+# 臨床心理でよく使われる尺度の略称例
+vars <- c("FFMQ", "STAI", "PSS", "DASS")
 
 tab <- lower_triangle_corr_table(df, vars)
 print(tab)
@@ -46,7 +47,7 @@ write.csv(out, "corr_lowertri.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
 ### 1-b) 下三角の相関表（r / p / stars の3ファイル＋Excel3シート）
 ```r
-vars <- c("PAS_特定項目", "SSS_総合得点", "PSS_総合得点", "DASS_抑うつ")
+vars <- c("FFMQ", "STAI", "PSS", "DASS")
 
 # CSV（_r/_p/_stars/_r_sig が付く。_r_sigの*列見出しは空白）
 write_lower_triangle_corr_tables(df, vars, "corr_lowertri")
@@ -58,8 +59,8 @@ write_lower_triangle_corr_xlsx(df, vars, "corr_lowertri.xlsx", font_name = "Hira
 
 ### 2) 行×列の相関表（特定の項目×尺度など）
 ```r
-rows <- c("PAS_特定項目", "PAS_2", "PAS_5")
-cols <- c("STAI_総合得点", "DASS_総合得点")
+rows <- c("FFMQ", "PSS")
+cols <- c("STAI", "DASS")
 
 mat <- nice_correlation(df, rows, cols)
 print(mat)
